@@ -83,7 +83,7 @@ void sistema() {
       Serial.print(qual);
       Serial.println(" qual");
       if (qual == 0) {
-        Serial.println("Que led sera trocado?\nSemáforo 1\n 1-)Verde 2-)Amarelo 3-)Vermelho\n\nSemáforo 2\n4-)Verde 5-)Amarelo 6-)Vermelho\n\nQual estado será trocado?\n7-)normal 8-)oscilando\n\n)Opções\n9-)Confimar 10-)Restaurar tempos 11-)Mostrar tempos12-)Forçar 13-)sair");
+        Serial.println("Que led sera trocado?\nSemáforo 1\n 1-)Verde 2-)Amarelo 3-)Vermelho\n\nSemáforo 2\n4-)Verde 5-)Amarelo 6-)Vermelho\n\nQual estado será trocado?\n7-)normal 8-)oscilando\n\n)Opções\n9-)Confimar 10-)Restaurar tempos \n11-)Mostrar tempos 12-)Forçar 13-)sair 14-)Sincronizar" );
         tempClear = clear;
       }
       if (qual == 1) {
@@ -157,6 +157,15 @@ void sistema() {
           tempClear = "";
           clear = "";
         }
+      }
+      if (qual == 14){
+        Serial.println("Sincronizando");
+        temp6 = temp1 + temp2;
+        temp3 = temp4 + temp5;
+        qual = 0;
+        resposta = false;
+        tempClear = "";
+        clear = "";
       }
     }
   }
