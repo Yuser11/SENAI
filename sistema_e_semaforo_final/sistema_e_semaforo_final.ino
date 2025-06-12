@@ -9,6 +9,7 @@ String senhas[2] = { "123", "321" };
 int msg = 0;
 String clear = "";
 int qual = 0;
+int tempVar;
 unsigned long millisTarefa1 = millis();
 unsigned long millisTarefa2 = millis();
 bool resposta = false;
@@ -48,24 +49,24 @@ void setup() {
 }
 void loop() {
 
-  declaracaoPinos();
+  DeclaracaoPinos();
   if (estado1 == "normal") {
-    funcionamentoNormalSemaforo1();
+    FuncionamentoNormalSemaforo1();
   } else if (estado1 == "oscilando") {
-    funcionamentoOscilandoSemaforo1();
+    FuncionamentoOscilandoSemaforo1();
   }
   if (estado2 == "normal") {
-    funcionamentoNormalSemaforo2();
+    FuncionamentoNormalSemaforo2();
   } else if (estado2 == "oscilando") {
-    funcionamentoOscilandoSemaforo2();
+    FuncionamentoOscilandoSemaforo2();
   }
   if (autorizado) {
-    sistema();
+    Sistema();
   } else {
-    autenticacao();
+    Autenticacao();
   }
 }
-void sistema() {
+void Sistema() {
   if (Serial.available()) {
     if (resposta == false) {
       if (clear == "prog") {
@@ -78,58 +79,77 @@ void sistema() {
       }
     }
     if (clear == "mostre") {
-      depurar();
+      Depurar();
     } else if (clear == "prog" || tempClear == "prog") {
       Serial.print(qual);
       Serial.println(" qual");
       if (qual == 0) {
-        Serial.println("Que led sera trocado?\nSemáforo 1\n 1-)Verde 2-)Amarelo 3-)Vermelho\n\nSemáforo 2\n4-)Verde 5-)Amarelo 6-)Vermelho\n\nQual estado será trocado?\n7-)normal 8-)oscilando\n\n)Opções\n9-)Confimar 10-)Restaurar tempos \n11-)Mostrar tempos 12-)Forçar 13-)sair 14-)Sincronizar" );
+        Serial.println("Que led sera configurado?\nSemáforo 1\n1-)Verde 2-)Vermelho\n\nSemáforo 2\n3-)Verde 4-)Vermelho\n\n5-)Amarelo\n\nQual estado será trocado?\n6-)normal 7-)oscilando\n\n)Opções\n8-)Confimar 9-)Restaurar tempos 10-)Mostrar tempos\n 11-)Forçar 12-)sair 13-)Sincronizar 14-)Instruções");
         tempClear = clear;
       }
       if (qual == 1) {
-        alterarVerde1();
+        AlterarVerde1();
       }
       if (qual == 2) {
-        alterarAmarelo1();
+        AlterarVermelho1();
       }
       if (qual == 3) {
-        alterarVermelho1();
+        AlterarVerde2();
       }
       if (qual == 4) {
-        alterarVerde2();
+        AlterarVermelho2();
       }
       if (qual == 5) {
-        alterarAmarelo2();
+        AlterarAmarelo();
       }
       if (qual == 6) {
-        alterarVermelho2();
+        EstadoNormal();
       }
       if (qual == 7) {
-        estadoNormal();
+        EstadoOscilando();
       }
       if (qual == 8) {
-        estadoOscilando();
+        Confirmar();
       }
       if (qual == 9) {
-        Serial.println("Confirmado");
-        confirmado1 = true;
-        confirmado2 = true;
-        qual = 0;
-        resposta = false;
-        tempClear = "";
-        clear = "";
+        RestaurarTempos();
       }
       if (qual == 10) {
-        restaurarTempos();
+        MostrarValores();
       }
       if (qual == 11) {
-        mostrarValores();
+        Forcar();
       }
       if (qual == 12) {
-        forcar();
+        Sair();
       }
       if (qual == 13) {
-        if (!confirmado1) {
+        Sincronizar();
+      }      
+      if (qual == 14){
+        Instrucoes();
+        }
+      }
+    }
+  }
+
+
+void Instrucoes(){
+  Serial.println("O verde deve estar aceso por 20 a 40 segundos");
+  Serial.println("O amarelo deve estar aceso por 3 a 5 segundos, caso precise");
+  Serial.println("O vermelho deve estar aceso por 20 a 80 segundos");
+}
+void Sincronizar(){
+  Serial.println("Sincronizando");
+  temp6 = temp1 + temp2;
+  temp3 = temp4 + temp5;
+  qual = 0;
+  resposta = false;
+  tempClear = "";
+  clear = "";
+}
+void Sair(){
+   if (!confirmado1) {
           if (!sair) {
             Serial.println("Sair sem confirmar?");
             sair = true;
@@ -157,77 +177,77 @@ void sistema() {
           tempClear = "";
           clear = "";
         }
-      }
-      if (qual == 14){
-        Serial.println("Sincronizando");
-        temp6 = temp1 + temp2;
-        temp3 = temp4 + temp5;
-        qual = 0;
-        resposta = false;
-        tempClear = "";
-        clear = "";
-      }
-    }
-  }
 }
-
-void alterarVerde1() {
+void Confirmar(){
+  Serial.println("Confirmado");
+  confirmado1 = true;
+  confirmado2 = true;
+  qual = 0;
+  resposta = false;
+  tempClear = "";
+  clear = "";
+}
+void AlterarVerde1() {
   if (resposta == false) {
     Serial.println("quantos segundos o sinal verde estará aberto?");
     resposta = true;
   } else {
-    temp1 = Serial.parseInt() * 1000;
+    tempVar = Serial.parseInt() * 1000;
+    if (tempVar > 20000 &&tempVar <40000){
+    temp1 = tempVar;
+    tempVar = 0;
     Serial.print(temp1);
     Serial.println(" temp1");
+    }else{
+      Serial.println("O valor deve ser entre 20 e 40 segundos");
+    }    
     qual = 0;
     resposta = false;
     tempClear = "";
     clear = "";
   }
 }
-void alterarAmarelo1() {
-  if (resposta == false) {
-    Serial.println("quantos segundos o sinal amarelo estará aberto?");
-    resposta = true;
-  } else {
-    temp2 = Serial.parseInt() * 1000;
-    Serial.print(temp2);
-    Serial.println(" temp2");
-    qual = 0;
-    resposta = false;
-    tempClear = "";
-    clear = "";
-  }
-}
-void alterarVermelho1() {
+void AlterarVermelho1() {
   if (resposta == false) {
     Serial.println("quantos segundos o sinal vermelho estará aberto?");
     resposta = true;
   } else {
-    temp3 = Serial.parseInt() * 1000;
+    tempVar = Serial.parseInt() * 1000;
+    if (tempVar > 20000 &&tempVar <80000){
+    temp3 = tempVar;
+    tempVar = 0;
     Serial.print(temp3);
     Serial.println(" temp3");
+    }else{
+      Serial.println("O valor deve ser entre 20 e 80 segundos");
+    }    
     qual = 0;
     resposta = false;
     tempClear = "";
     clear = "";
   }
 }
-void alterarVerde2() {
+void AlterarVerde2() {
   if (resposta == false) {
     Serial.println("quantos segundos o sinal verde estará aberto?");
     resposta = true;
   } else {
-    temp4 = Serial.parseInt() * 1000;
+    tempVar = Serial.parseInt() * 1000;
+    if (tempVar > 20000 &&tempVar <40000){
+    temp4 = tempVar;
+    tempVar = 0;
     Serial.print(temp4);
     Serial.println(" temp4");
+    }else{
+      Serial.println("O valor deve ser entre 20 e 40 segundos");
+    }    
     qual = 0;
     resposta = false;
     tempClear = "";
     clear = "";
   }
 }
-void alterarAmarelo2() {
+void AlterarAmarelo() {
   if (resposta == false) {
     Serial.println("quantos segundos o sinal amarelo estará aberto?");
     resposta = true;
@@ -241,21 +261,27 @@ void alterarAmarelo2() {
     clear = "";
   }
 }
-void alterarVermelho2() {
+void AlterarVermelho2() {
   if (resposta == false) {
     Serial.println("quantos segundos o sinal vermelho estará aberto?");
     resposta = true;
   } else {
-    temp6 = Serial.parseInt() * 1000;
+    tempVar = Serial.parseInt() * 1000;
+    if (tempVar > 20000 &&tempVar <80000){
+    temp6 = tempVar;
+    tempVar = 0;
     Serial.print(temp6);
     Serial.println(" temp6");
+    }else{
+      Serial.println("O valor deve ser entre 20 e 80 segundos");
+    }
     qual = 0;
     resposta = false;
     tempClear = "";
     clear = "";
   }
 }
-void estadoNormal() {
+void EstadoNormal() {
   Serial.println("Alterando para estado normal");
   tempEstado = "normal";
   qual = 0;
@@ -263,7 +289,7 @@ void estadoNormal() {
   tempClear = "";
   clear = "";
 }
-void estadoOscilando() {
+void EstadoOscilando() {
   Serial.println("Alterando para estado oscilando");
   tempEstado = "oscilando";
   qual = 0;
@@ -271,20 +297,20 @@ void estadoOscilando() {
   tempClear = "";
   clear = "";
 }
-void restaurarTempos() {
+void RestaurarTempos() {
   Serial.println("Resturando tempos originais");
-  temp1 = 42000;
-  temp2 = 2000;
+  temp1 = 40000;
+  temp2 = 4000;
   temp3 = 45000;
   temp4 = 45000;
-  temp5 = 2000;
-  temp6 = 42000;
+  temp5 = 4000;
+  temp6 = 40000;
   qual = 0;
   resposta = false;
   tempClear = "";
   clear = "";
 }
-void mostrarValores() {
+void MostrarValores() {
   Serial.println("TEMPOS");
   Serial.println("Semáforo 1");
   Serial.print((temp1 / 1000));
@@ -305,21 +331,21 @@ void mostrarValores() {
   tempClear = "";
   clear = "";
 }
-void forcar() {
+void Forcar() {
   Serial.println("Valores sendo alterado agora");
   confirmado1 = true;
   confirmado2 = true;
-  desligatudo();
+  Desligatudo();
   millisTarefa1 = millis();
   millisTarefa2 = millis();
-  alteracao1();
-  alteracao2();
+  Alteracao1();
+  Alteracao2();
   qual = 0;
   resposta = false;
   tempClear = "";
   clear = "";
 }
-void desligatudo() {
+void Desligatudo() {
   digitalWrite(vm1, LOW);
   digitalWrite(vd1, LOW);
   digitalWrite(amrl1, LOW);
@@ -327,7 +353,7 @@ void desligatudo() {
   digitalWrite(amrl2, LOW);
   digitalWrite(vm2, LOW);
 }
-void alteracao1() {
+void Alteracao1() {
   if (confirmado1) {
     verde1 = temp1;
     amarelo1 = verde1 + temp2;
@@ -336,7 +362,7 @@ void alteracao1() {
     confirmado1 = false;
   }
 }
-void alteracao2() {
+void Alteracao2() {
   if (confirmado2) {
     vermelho2 = temp6;
     verde2 = vermelho2 + temp4;
@@ -345,7 +371,7 @@ void alteracao2() {
     confirmado2 = false;
   }
 }
-void depurar() {
+void Depurar() {
   Serial.println(clear);
   Serial.print(qual);
   Serial.println(" qual");
@@ -368,7 +394,7 @@ void depurar() {
   Serial.println(estado2);
   Serial.println(tempEstado);
 }
-void declaracaoPinos() {
+void DeclaracaoPinos() {
   pinMode(vm1, OUTPUT);
   pinMode(vd1, OUTPUT);
   pinMode(amrl1, OUTPUT);
@@ -376,7 +402,7 @@ void declaracaoPinos() {
   pinMode(amrl2, OUTPUT);
   pinMode(vm2, OUTPUT);
 }
-void funcionamentoNormalSemaforo1() {
+void FuncionamentoNormalSemaforo1() {
   if ((millis() - millisTarefa1) < verde1) {
     digitalWrite(vm1, LOW);
     digitalWrite(vd1, HIGH);
@@ -388,10 +414,10 @@ void funcionamentoNormalSemaforo1() {
     digitalWrite(vm1, HIGH);
   } else if (millis() - millisTarefa1 > vermelho1) {
     millisTarefa1 = millis();
-    alteracao1();
+    Alteracao1();
   }
 }
-void funcionamentoOscilandoSemaforo1() {
+void FuncionamentoOscilandoSemaforo1() {
   if ((millis() - millisTarefa1) < temp2) {
     digitalWrite(amrl1, HIGH);
     digitalWrite(vd1, LOW);
@@ -400,10 +426,10 @@ void funcionamentoOscilandoSemaforo1() {
     digitalWrite(amrl1, LOW);
   } else {
     millisTarefa1 = millis();
-    alteracao1();
+    Alteracao1();
   }
 }
-void funcionamentoNormalSemaforo2() {
+void FuncionamentoNormalSemaforo2() {
   if ((millis() - millisTarefa2) < vermelho2) {
     digitalWrite(vm2, HIGH);
     digitalWrite(amrl2, LOW);
@@ -416,10 +442,10 @@ void funcionamentoNormalSemaforo2() {
   } else if ((millis() - millisTarefa2) > amarelo2) {
     millisTarefa2 = millis();
     digitalWrite(amrl2, LOW);
-    alteracao2();
+    Alteracao2();
   }
 }
-void funcionamentoOscilandoSemaforo2() {
+void FuncionamentoOscilandoSemaforo2() {
   if ((millis() - millisTarefa2) < temp5) {
     digitalWrite(amrl2, HIGH);
     digitalWrite(vd2, LOW);
@@ -428,10 +454,10 @@ void funcionamentoOscilandoSemaforo2() {
     digitalWrite(amrl2, LOW);
   } else {
     millisTarefa2 = millis();
-    alteracao2();
+    Alteracao2();
   }
 }
-void autenticacao() {
+void Autenticacao() {
   if (Serial.available()) {
     if (clear != "prog") {
       clear = Serial.readString();
@@ -461,6 +487,7 @@ void autenticacao() {
             autorizado = true;
             Serial.println("autorizado");
             clear = "";
+            Serial.println("Antes de fazer alterações, veja as intruções");
           }
         }
       }
