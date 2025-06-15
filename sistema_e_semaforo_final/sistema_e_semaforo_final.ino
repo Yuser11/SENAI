@@ -10,7 +10,7 @@ String senhas[2] = { "123", "321" };
 unsigned long millisTarefa1 = millis();
 unsigned long millisTarefa2 = millis();
 
-int qual = 0;
+int opcao = 0;
 int tempVar;
 int msg = 0;
 int verde1 = 25000;
@@ -44,6 +44,7 @@ bool sair = false;
 
 void setup() {
   Serial.begin(9600);
+  //intervalo de tempo de cada cor
   verde1 = verde1;
   amarelo1 = verde1 + amarelo1;
   vermelho1 = amarelo1 + vermelho1;
@@ -73,69 +74,110 @@ void loop() {
 void Sistema() {
   if (Serial.available()) {
     if (resposta == false) {
+      //armazena o valor da serial
       if (clear == "prog") {
         clear = Serial.readString();
         clear.trim();
-        qual = clear.toInt();
+        opcao = clear.toInt();
       } else {
         clear = Serial.readString();
         clear.trim();
       }
     }
     if (clear == "prog" || tempClear == "prog") {
-      if (qual == 0) {
-        Serial.println("Que led sera configurado?\nSemáforo 1\n1-)Verde 2-)Vermelho\n\nSemáforo 2\n3-)Verde 4-)Vermelho\n\nFluxos\n5-)Fluxo padrão 6-)Fluxo acelerado\n\nTrocar para qual estado?\n7-)normal 8-)oscilando\n\n)Opções\n9-)Confimar 10-)Mostrar tempos\n11-)Forçar 12-)sair 13-)Sincronizar 14-)Instruções");
+      if (opcao == 0) {
+        Serial.println("\nQue led sera configurado?\nSemáforo 1\n1-)Verde 2-)Vermelho\n\nSemáforo 2\n3-)Verde 4-)Vermelho\n\nFluxos\n5-)Fluxo padrão 6-)Fluxo acelerado\n\nTrocar para qual estado?\n7-)normal 8-)oscilando\n\n)Opções\n9-)Confimar 10-)Mostrar tempos\n11-)Forçar 12-)sair 13-)Sincronizar 14-)Instruções");
         tempClear = clear;
       }
-      if (qual == 1) {
+      if (opcao == 1) {
         AlterarVerde1();
       }
-      if (qual == 2) {
+      if (opcao == 2) {
         AlterarVermelho1();
       }
-      if (qual == 3) {
+      if (opcao == 3) {
         AlterarVerde2();
       }
-      if (qual == 4) {
+      if (opcao == 4) {
         AlterarVermelho2();
       }
-      if (qual == 5) {
+      if (opcao == 5) {
         FluxoPadrao();
       }
-      if (qual == 6){
+      if (opcao == 6){
         FluxoAcelerado();
       }
-      if (qual == 7) {
+      if (opcao == 7) {
         EstadoNormal();
       }
-      if (qual == 8) {
+      if (opcao == 8) {
         EstadoOscilando();
       }
-      if (qual == 9) {
+      if (opcao == 9) {
         Confirmar();
       }
-      if (qual == 10) {
+      if (opcao == 10) {
         MostrarValores();
       }
-      if (qual == 11) {
+      if (opcao == 11) {
         Forcar();
       }
-      if (qual == 12) {
+      if (opcao == 12) {
         Sair();
       }
-      if (qual == 13) {
+      if (opcao == 13) {
         Sincronizar();
       }      
-      if (qual == 14){
+      if (opcao == 14){
         Instrucoes();
         }
       }
     }
   }
+void Autenticacao() {
+  //verifica se há mensagem na serial
+  if (Serial.available()) {
+    if (clear != "prog") {
+      clear = Serial.readString();
+      clear.trim();
+    }
+    if (clear == "prog") {
+      if (!usuario) {
+        Serial.println("Digite o usuário");
+        usuario = true;
+      } else if (!senha) {
+        //armazena o usuario
+        identidade = Serial.readString();
+        identidade.trim();
+        Serial.println("Digite a senha");
+        senha = true;
+      } else if (senha && usuario) {
+        //armazena a senha
+        chave = Serial.readString();
+        chave.trim();
+        for (int i = 0; i < sizeof funcionarios / sizeof funcionarios[0]; i++) {
+          String n = funcionarios[i];
+          //retorna ao valor inicial das variaveis
+          senha = false;
+          usuario = false;
+          clear = "";
+          //percorre as arrays e verifica a senha e o usuario na mesma posicao são os iguais aos valores escritos pela serial
+          if (n == identidade && chave == senhas[i]) {
+            autorizado = true;
+            Serial.println("autorizado");
+            clear = "";
+            Serial.println("\nAntes de fazer alterações, veja as intruções \n");
+            Instrucoes();
+          }
+        }
+      }
+    }
+  }
+}
 void Instrucoes(){
   Serial.println("O verde deve estar aceso por 20 a 40 segundos");
   Serial.println("O vermelho deve estar aceso por 20 a 80 segundos");
-  qual = 0;
+  opcao = 0;
   resposta = false;
   tempClear = "";
   clear = "";
@@ -144,7 +186,7 @@ void Sincronizar(){
   Serial.println("Sincronizando");
   temp6 = temp1 + temp2;
   temp3 = temp4 + temp5;
-  qual = 0;
+  opcao = 0;
   resposta = false;
   tempClear = "";
   clear = "";
@@ -154,7 +196,7 @@ void Sair(){
           if (!sair) {
             Serial.println("Sair sem confirmar?");
             sair = true;
-            qual = 0;
+            opcao = 0;
             resposta = false;
             tempClear = "";
             clear = "";
@@ -163,7 +205,7 @@ void Sair(){
             autorizado = false;
             identidade = "";
             chave = "";
-            qual = 0;
+            opcao = 0;
             resposta = false;
             tempClear = "";
             clear = "";
@@ -173,7 +215,7 @@ void Sair(){
           autorizado = false;
           identidade = "";
           chave = "";
-          qual = 0;
+          opcao = 0;
           sair = false;
           tempClear = "";
           clear = "";
@@ -183,7 +225,7 @@ void Confirmar(){
   Serial.println("Confirmado");
   confirmado1 = true;
   confirmado2 = true;
-  qual = 0;
+  opcao = 0;
   resposta = false;
   tempClear = "";
   clear = "";
@@ -197,12 +239,12 @@ void AlterarVerde1() {
     if (tempVar >= 20000 &&tempVar <= 40000){
     temp1 = tempVar;
     tempVar = 0;
-    Serial.print(temp1);
-    Serial.println(" temp1");
+    Serial.print(temp1 / 1000);
+    Serial.println(" segundos no verde");
     }else{
       Serial.println("O valor deve ser entre 20 e 40 segundos");
     }    
-    qual = 0;
+    opcao = 0;
     resposta = false;
     tempClear = "";
     clear = "";
@@ -217,12 +259,12 @@ void AlterarVermelho1() {
     if (tempVar >= 20000 &&tempVar <= 80000){
     temp3 = tempVar;
     tempVar = 0;
-    Serial.print(temp3);
-    Serial.println(" temp3");
+    Serial.print(temp3 / 2000 );
+    Serial.println(" segundos no vermelho");
     }else{
       Serial.println("O valor deve ser entre 20 e 80 segundos");
     }    
-    qual = 0;
+    opcao = 0;
     resposta = false;
     tempClear = "";
     clear = "";
@@ -237,12 +279,12 @@ void AlterarVerde2() {
     if (tempVar >= 20000 &&tempVar <= 40000){
     temp4 = tempVar;
     tempVar = 0;
-    Serial.print(temp4);
-    Serial.println(" temp4");
+    Serial.print(temp4 / 1000);
+    Serial.println(" segundos no verde");
     }else{
       Serial.println("O valor deve ser entre 20 e 40 segundos");
     }    
-    qual = 0;
+    opcao = 0;
     resposta = false;
     tempClear = "";
     clear = "";
@@ -257,12 +299,12 @@ void AlterarVermelho2() {
     if (tempVar > 20000 &&tempVar <80000){
     temp6 = tempVar;
     tempVar = 0;
-    Serial.print(temp6);
-    Serial.println(" temp6");
+    Serial.print(temp6 / 1000);
+    Serial.println(" segundos no vermelho");
     }else{
       Serial.println("O valor deve ser entre 20 e 80 segundos");
     }
-    qual = 0;
+    opcao = 0;
     resposta = false;
     tempClear = "";
     clear = "";
@@ -271,7 +313,7 @@ void AlterarVermelho2() {
 void EstadoNormal() {
   Serial.println("Alterando para estado normal");
   tempEstado = "normal";
-  qual = 0;
+  opcao = 0;
   resposta = false;
   tempClear = "";
   clear = "";
@@ -279,7 +321,7 @@ void EstadoNormal() {
 void EstadoOscilando() {
   Serial.println("Alterando para estado oscilando");
   tempEstado = "oscilando";
-  qual = 0;
+  opcao = 0;
   resposta = false;
   tempClear = "";
   clear = "";
@@ -292,7 +334,7 @@ void FluxoPadrao() {
   temp4 = 40000;
   temp5 = 4000;
   temp6 = 45000;
-  qual = 0;
+  opcao = 0;
   resposta = false;
   tempClear = "";
   clear = "";
@@ -305,7 +347,7 @@ void FluxoAcelerado(){
   temp4 = 20000;
   temp5 = 4000;
   temp6 = 25000;
-  qual = 0;
+  opcao = 0;
   resposta = false;
   tempClear = "";
   clear = "";
@@ -326,7 +368,7 @@ void MostrarValores() {
   Serial.println(" segundos no amarelo");
   Serial.print((temp6 / 1000));
   Serial.println(" segundos no vermelho");
-  qual = 0;
+  opcao = 0;
   resposta = false;
   tempClear = "";
   clear = "";
@@ -340,7 +382,7 @@ void Forcar() {
   millisTarefa2 = millis();
   Alteracao1();
   Alteracao2();
-  qual = 0;
+  opcao = 0;
   resposta = false;
   tempClear = "";
   clear = "";
@@ -433,40 +475,5 @@ void FuncionamentoOscilandoSemaforo2() {
   } else {
     millisTarefa2 = millis();
     Alteracao2();
-  }
-}
-void Autenticacao() {
-  if (Serial.available()) {
-    if (clear != "prog") {
-      clear = Serial.readString();
-      clear.trim();
-    }
-    if (clear == "prog") {
-      if (!usuario) {
-        Serial.println("Digite o usuário");
-        usuario = true;
-      } else if (!senha) {
-        identidade = Serial.readString();
-        identidade.trim();
-        Serial.println("Digite a senha");
-        senha = true;
-      } else if (senha && usuario) {
-        chave = Serial.readString();
-        chave.trim();
-        for (int i = 0; i < sizeof funcionarios / sizeof funcionarios[0]; i++) {
-          String n = funcionarios[i];
-          senha = false;
-          usuario = false;
-          clear = "";
-          if (n == identidade && chave == senhas[i]) {
-            autorizado = true;
-            Serial.println("autorizado");
-            clear = "";
-            Serial.println("Antes de fazer alterações, veja as intruções \n\n");
-            Instrucoes();
-          }
-        }
-      }
-    }
   }
 }
