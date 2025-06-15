@@ -73,6 +73,7 @@ void loop() {
 }
 void Sistema() {
   if (Serial.available()) {
+    //se a proxima mensagem na serial for de resposta
     if (resposta == false) {
       //armazena o valor da serial
       if (clear == "prog") {
@@ -161,7 +162,7 @@ void Autenticacao() {
           senha = false;
           usuario = false;
           clear = "";
-          //percorre as arrays e verifica a senha e o usuario na mesma posicao são os iguais aos valores escritos pela serial
+          //percorre as arrays e verifica a senha se o usuario na mesma posicao são os iguais aos valores escritos pela serial
           if (n == identidade && chave == senhas[i]) {
             autorizado = true;
             Serial.println("autorizado");
