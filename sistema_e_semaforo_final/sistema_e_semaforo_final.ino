@@ -341,7 +341,7 @@ void FluxoPadrao() {
   clear = "";
 }
 void FluxoAcelerado(){
-  Serial.println("Alterando para fluxo padrão");
+  Serial.println("Alterando para fluxo acelerado");
   temp1 = 20000;
   temp2 = 4000;
   temp3 = 25000;
